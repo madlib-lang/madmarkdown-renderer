@@ -1,0 +1,19 @@
+import { render } from "MadUI"
+import { renderMarkdown } from "./Main"
+
+markdown = `
+# Hello world
+
+This is a **paragraph**
+and the *next* line
+
+> blockquote!
+**hehe**
+
+\`\`\`
+Some code!
+\`\`\`
+
+`
+
+render((_) => renderMarkdown(markdown), (), "app")

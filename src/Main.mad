@@ -1,0 +1,72 @@
+import { Left, Right } from "Either"
+import {
+  parseMarkdown,
+  Bold,
+  Block,
+  Blockquote,
+  Code,
+  Content,
+  ContentPart,
+  H1,
+  Italic,
+  LineReturn,
+  Markdown,
+  Paragraph,
+  Text
+} from "MarkdownParser"
+import {
+  blockquote,
+  br,
+  className,
+  code,
+  div,
+  h1,
+  i,
+  p,
+  span,
+  strong,
+  text,
+  Element,
+  View
+} from "MadUI"
+import IO from "IO"
+
+doRender :: View Markdown
+doRender = (markdown) =>
+  <div className="markdown">
+    {map(renderBlock, markdown)}
+  </div>
+
+renderBlock :: View Block
+renderBlock = where
+  is H1 content:
+    <h1>{renderContent(content)}</h1>
+
+  is Paragraph content:
+    <p>{renderContent(content)}</p>
+
+  is Blockquote content:
+    <blockquote>{renderContent(content)}</blockquote>
+
+  is Code _ content:
+    <code>{content}</code>
+
+
+
+renderContentPart :: View ContentPart
+renderContentPart = where
+  is Text t    : <span className="markdown__text">{t}</span>
+  is Bold t    : <strong className="markdown__bold">{t}</strong>
+  is Italic t  : <i className="markdown__italic">{t}</i>
+  is LineReturn: <br />
+
+renderContent :: Content -> List Element
+renderContent = map(renderContentPart)
+
+renderMarkdown :: View String
+export renderMarkdown = pipe(
+  parseMarkdown,
+  where
+    is Right ast: doRender(ast)
+    is Left _   : <p>Error processing the given markdown</p>
+)

@@ -1,0 +1,9 @@
+{
+  "name": "madmarkdown-renderer",
+  "version": "0.0.1",
+  "main": "src/Main.mad",
+  "dependencies": {
+    "MarkdownParser": "https://github.com/madlib-lang/madmarkdown-parser/archive/refs/heads/master.zip",
+    "MadUI": "https://github.com/madlib-lang/madui/archive/refs/heads/master.zip"
+  }
+}
