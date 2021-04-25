@@ -2,7 +2,8 @@ import { render } from "MadUI"
 import { renderMarkdown } from "./Main"
 
 markdown = `
-# Hello world
+# Title
+### subtitle
 
 This is a **paragraph**
 and the *next* line
@@ -13,6 +14,14 @@ and the *next* line
 \`\`\`
 Some code!
 \`\`\`
+
+- list item
+- **list** \`item\`
+- list *item*
+- [link](https://www.google.com)
+
+
+![madlib logo](./madlib-logo.png)
 
 `
 
