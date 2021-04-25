@@ -51,7 +51,6 @@ import {
   Element,
   View
 } from "MadUI"
-import IO from "IO"
 
 doRender :: View Markdown
 doRender = (markdown) =>
@@ -104,6 +103,13 @@ renderContentPart = where
 renderContent :: Content -> List Element
 renderContent = map(renderContentPart)
 
+/**
+ * Returns an Element from a given markdown String
+ *
+ * @since 0.0.1
+ * @example
+ * renderMarkdown(`# Hello world`)
+ */
 renderMarkdown :: View String
 export renderMarkdown = pipe(
   parseMarkdown,
