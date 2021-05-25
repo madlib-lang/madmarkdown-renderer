@@ -6,5 +6,8 @@
   "dependencies": {
     "MarkdownParser": "https://github.com/madlib-lang/madmarkdown-parser/archive/refs/heads/master.zip",
     "MadUI": "https://github.com/madlib-lang/madui/archive/refs/heads/master.zip"
+  },
+  "importAliases": {
+    "@": "src"
   }
 }
