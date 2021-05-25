@@ -46,7 +46,7 @@ import {
 } from "MadUI"
 
 import type { Config } from "@/Config"
-import { defaultConfig } from "@/Config"
+import { defaultConfig, setLinkView } from "@/Config"
 
 doRender :: Config -> View Markdown
 doRender = (config, markdown) =>
@@ -121,3 +121,7 @@ export renderMarkdownWithConfig = (config) => pipe(
     is Right ast: doRender(config, ast)
     is Left _   : <p>Error processing the given markdown</p>
 )
+
+export defaultConfig
+export setLinkView
+export type Config
