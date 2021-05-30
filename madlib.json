@@ -8,6 +8,6 @@
     "MadUI": "https://github.com/madlib-lang/madui/archive/refs/heads/master.zip"
   },
   "importAliases": {
-    "@": "src"
+    ".": "src"
   }
 }
