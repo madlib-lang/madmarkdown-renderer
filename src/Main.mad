@@ -1,5 +1,5 @@
 import { Left, Right } from "Either"
-import type { Block, Content, ContentPart, Markdown } from "MarkdownParser"
+import { Block, Content, ContentPart, Markdown } from "MarkdownParser"
 import {
   parseMarkdown,
   Bold,
@@ -20,7 +20,7 @@ import {
   UnorderedList,
   Text
 } from "MarkdownParser"
-import type { Element, View } from "MadUI"
+import { Element, View } from "MadUI"
 import {
   alt,
   blockquote,
@@ -45,7 +45,7 @@ import {
   text
 } from "MadUI"
 
-import type { Config } from "@/Config"
+import { Config } from "@/Config"
 import { defaultConfig, setLinkView } from "@/Config"
 
 doRender :: Config -> View Markdown
