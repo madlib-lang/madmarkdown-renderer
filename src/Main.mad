@@ -1,5 +1,5 @@
 import { Left, Right } from "Either"
-import type { Block, Content, ContentPart, Markdown } from "MarkdownParser"
+import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
 import {
   parseMarkdown,
   Bold,
@@ -19,7 +19,7 @@ import {
   Paragraph,
   UnorderedList,
   Text
-} from "MarkdownParser"
+} from "MadMarkdownParser"
 import type { Element, View } from "MadUI"
 import {
   alt,
@@ -55,49 +55,77 @@ doRender = (config, markdown) =>
   </div>
 
 renderBlock :: Config -> View Block
-renderBlock = (config) => where
-  is H1 content:
+renderBlock = (config) => where {
+  H1(content) =>
     <h1>{renderContent(config, content)}</h1>
 
-  is H2 content:
+  H2(content) =>
     <h2>{renderContent(config, content)}</h2>
 
-  is H3 content:
+  H3(content) =>
     <h3>{renderContent(config, content)}</h3>
 
-  is H4 content:
+  H4(content) =>
     <h4>{renderContent(config, content)}</h4>
 
-  is H5 content:
+  H5(content) =>
     <h5>{renderContent(config, content)}</h5>
 
-  is H6 content:
+  H6(content) =>
     <h6>{renderContent(config, content)}</h6>
 
-  is Paragraph content:
+  Paragraph(content) =>
     <p>{renderContent(config, content)}</p>
 
-  is Blockquote content:
+  Blockquote(content) =>
     <blockquote>{renderContent(config, content)}</blockquote>
 
-  is Code _ content:
+  Code(_, content) =>
     <code>{content}</code>
 
-  is UnorderedList items:
+  UnorderedList(items) =>
     <ul>{map((item) => <li>{renderContent(config, item)}</li>, items)}</ul>
+}
 
 renderContentPart :: Config -> View ContentPart
-renderContentPart = (config) => where
-  is Text t      : <span className="markdown__text">{t}</span>
-  is Bold t      : <strong className="markdown__bold">{t}</strong>
-  is Italic t    : <i className="markdown__italic">{t}</i>
-  is InlineCode t: <span className="markdown__inline-code">{t}</span>
-  is Link t l    : config.linkView(t, l)
-  is Image alt_ s: <img className="markdown__image" src={s} alt={alt_} />
-  is LineReturn  : <br />
+renderContentPart = (config) => where{
+  Text(t) =>
+    <span className="markdown__text">{t}</span>
+
+  Bold(t) =>
+    <strong className="markdown__bold">{t}</strong>
+
+  Italic(t) =>
+    <i className="markdown__italic">{t}</i>
+
+  InlineCode(t) =>
+    <span className="markdown__inline-code">{t}</span>
+
+  Link(t, l) =>
+    config.linkView(t, l)
+
+  Image(alt_, s) =>
+    <img className="markdown__image" src={s} alt={alt_} />
+
+  LineReturn =>
+    <br />
+}
 
 renderContent :: Config -> Content -> List Element
 renderContent = (config) => map(renderContentPart(config))
+
+
+renderMarkdownWithConfig :: Config -> String -> Element
+export renderMarkdownWithConfig = (config) => pipe(
+  parseMarkdown,
+  where {
+    Right(ast) =>
+      doRender(config, ast)
+
+    Left(_) =>
+      <p>Error processing the given markdown</p>
+  }
+)
 
 /**
  * Returns an Element from a given markdown String
@@ -106,21 +134,8 @@ renderContent = (config) => map(renderContentPart(config))
  * @example
  * renderMarkdown(`# Hello world`)
  */
-renderMarkdown :: String -> Element
-export renderMarkdown = pipe(
-  parseMarkdown,
-  where
-    is Right ast: doRender(defaultConfig, ast)
-    is Left _   : <p>Error processing the given markdown</p>
-)
-
-renderMarkdownWithConfig :: Config -> String -> Element
-export renderMarkdownWithConfig = (config) => pipe(
-  parseMarkdown,
-  where
-    is Right ast: doRender(config, ast)
-    is Left _   : <p>Error processing the given markdown</p>
-)
+ renderMarkdown :: String -> Element
+ export renderMarkdown = renderMarkdownWithConfig(defaultConfig)
 
 export defaultConfig
 export setLinkView
