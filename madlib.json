@@ -1,5 +1,5 @@
 {
-  "name": "madmarkdown-renderer",
+  "name": "MadMarkdownRenderer",
   "version": "0.0.1",
   "madlibVersion": "0.9.0",
   "main": "src/Main.mad",
