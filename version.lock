@@ -1,0 +1,16 @@
+{
+  "buildHash": "e4bb30d3080d94b6954eb5a45e1a7f67",
+  "versionHash": "fbacc30a1f288ebf360ad2de66710082",
+  "api": {
+    "apiNames": {
+      "defaultConfig": "{ linkView :: String -> String -> Element }",
+      "setLinkView": "(String -> String -> Element) -> { linkView :: String -> String -> Element } -> { linkView :: String -> String -> Element }",
+      "renderMarkdownWithConfig": "{ linkView :: String -> String -> Element } -> String -> Element",
+      "renderMarkdown": "String -> Element"
+    },
+    "apiInstances": [],
+    "apiAliases": {},
+    "apiTypes": {},
+    "apiInterfaces": {}
+  }
+}
