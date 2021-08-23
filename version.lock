@@ -1,6 +1,6 @@
 {
-  "buildHash": "e4bb30d3080d94b6954eb5a45e1a7f67",
-  "versionHash": "fbacc30a1f288ebf360ad2de66710082",
+  "buildHash": "8c73cef36e5edfbe9933c26c3ceeb58f",
+  "versionHash": "7f76975313afde67f0b4efca59761e8a",
   "api": {
     "apiNames": {
       "defaultConfig": "{ linkView :: String -> String -> Element }",

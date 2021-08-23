@@ -20,7 +20,7 @@ import {
   UnorderedList,
   Text
 } from "MadMarkdownParser"
-import type { Element, View } from "MadUI"
+import type { Element } from "MadUI"
 import {
   alt,
   blockquote,
@@ -48,13 +48,13 @@ import {
 import type { Config } from "@/Config"
 import { defaultConfig, setLinkView } from "@/Config"
 
-doRender :: Config -> View Markdown
+doRender :: Config -> Markdown -> Element
 doRender = (config, markdown) =>
   <div className="markdown">
     {map(renderBlock(config), markdown)}
   </div>
 
-renderBlock :: Config -> View Block
+renderBlock :: Config -> Block -> Element
 renderBlock = (config) => where {
   H1(content) =>
     <h1>{renderContent(config, content)}</h1>
@@ -87,7 +87,7 @@ renderBlock = (config) => where {
     <ul>{map((item) => <li>{renderContent(config, item)}</li>, items)}</ul>
 }
 
-renderContentPart :: Config -> View ContentPart
+renderContentPart :: Config -> ContentPart -> Element
 renderContentPart = (config) => where{
   Text(t) =>
     <span className="markdown__text">{t}</span>
