@@ -51,40 +51,40 @@ import { defaultConfig, setLinkView } from "@/Config"
 doRender :: Config -> Markdown -> Element
 doRender = (config, markdown) =>
   <div className="markdown">
-    {map(renderBlock(config), markdown)}
+    {...map(renderBlock(config), markdown)}
   </div>
 
 renderBlock :: Config -> Block -> Element
 renderBlock = (config) => where {
   H1(content) =>
-    <h1>{renderContent(config, content)}</h1>
+    <h1>{...renderContent(config, content)}</h1>
 
   H2(content) =>
-    <h2>{renderContent(config, content)}</h2>
+    <h2>{...renderContent(config, content)}</h2>
 
   H3(content) =>
-    <h3>{renderContent(config, content)}</h3>
+    <h3>{...renderContent(config, content)}</h3>
 
   H4(content) =>
-    <h4>{renderContent(config, content)}</h4>
+    <h4>{...renderContent(config, content)}</h4>
 
   H5(content) =>
-    <h5>{renderContent(config, content)}</h5>
+    <h5>{...renderContent(config, content)}</h5>
 
   H6(content) =>
-    <h6>{renderContent(config, content)}</h6>
+    <h6>{...renderContent(config, content)}</h6>
 
   Paragraph(content) =>
-    <p>{renderContent(config, content)}</p>
+    <p>{...renderContent(config, content)}</p>
 
   Blockquote(content) =>
-    <blockquote>{renderContent(config, content)}</blockquote>
+    <blockquote>{...renderContent(config, content)}</blockquote>
 
   Code(_, content) =>
     <code>{content}</code>
 
   UnorderedList(items) =>
-    <ul>{map((item) => <li>{renderContent(config, item)}</li>, items)}</ul>
+    <ul>{...map((item) => <li>{...renderContent(config, item)}</li>, items)}</ul>
 }
 
 renderContentPart :: Config -> ContentPart -> Element

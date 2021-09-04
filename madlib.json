@@ -1,15 +1,15 @@
 {
   "name": "MadMarkdownRenderer",
-  "version": "0.0.3",
-  "madlibVersion": "0.9.0",
+  "version": "0.0.4",
+  "madlibVersion": "0.11.0",
   "main": "src/Main.mad",
   "importAliases": {
     ".": "src"
   },
   "dependencies": [
     {
-      "minVersion": "1.0.0",
-      "url": "https://github.com/madlib-lang/madui/archive/refs/tags/v1.0.0.zip",
+      "minVersion": "2.0.0",
+      "url": "https://github.com/madlib-lang/madui/archive/refs/tags/v2.0.0.zip",
       "description": "MadUI"
     },
     {
