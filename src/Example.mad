@@ -25,4 +25,4 @@ Some code!
 
 `
 
-render((_) => renderMarkdown(markdown), (), "app")
+render((_) => renderMarkdown(markdown), {}, "app")
