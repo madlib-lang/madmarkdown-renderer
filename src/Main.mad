@@ -48,13 +48,13 @@ import {
 import type { Config } from "@/Config"
 import { defaultConfig, setLinkView } from "@/Config"
 
-doRender :: Config -> Markdown -> Element
+doRender :: Config a -> Markdown -> Element a
 doRender = (config, markdown) =>
   <div className="markdown">
     {...map(renderBlock(config), markdown)}
   </div>
 
-renderBlock :: Config -> Block -> Element
+renderBlock :: Config a -> Block -> Element a
 renderBlock = (config) => where {
   H1(content) =>
     <h1>{...renderContent(config, content)}</h1>
@@ -87,7 +87,7 @@ renderBlock = (config) => where {
     <ul>{...map((item) => <li>{...renderContent(config, item)}</li>, items)}</ul>
 }
 
-renderContentPart :: Config -> ContentPart -> Element
+renderContentPart :: Config a -> ContentPart -> Element a
 renderContentPart = (config) => where{
   Text(t) =>
     <span className="markdown__text">{t}</span>
@@ -111,11 +111,11 @@ renderContentPart = (config) => where{
     <br />
 }
 
-renderContent :: Config -> Content -> List Element
+renderContent :: Config a -> Content -> List (Element a)
 renderContent = (config) => map(renderContentPart(config))
 
 
-renderMarkdownWithConfig :: Config -> String -> Element
+renderMarkdownWithConfig :: Config a -> String -> Element a
 export renderMarkdownWithConfig = (config) => pipe(
   parseMarkdown,
   where {
@@ -134,7 +134,7 @@ export renderMarkdownWithConfig = (config) => pipe(
  * @example
  * renderMarkdown(`# Hello world`)
  */
- renderMarkdown :: String -> Element
+ renderMarkdown :: String -> Element a
  export renderMarkdown = renderMarkdownWithConfig(defaultConfig)
 
 export defaultConfig

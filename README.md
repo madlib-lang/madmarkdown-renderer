@@ -21,6 +21,6 @@ yourMarkdown = `
 # Hello World
 `
 
-render((_) => renderMarkdown(yourMarkdown), (), "app")
+render((_) => renderMarkdown(yourMarkdown), {}, "app")
 
 ```
