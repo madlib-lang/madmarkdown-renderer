@@ -26,7 +26,6 @@ import {
   blockquote,
   br,
   className,
-  code,
   div,
   h1,
   h2,
@@ -46,7 +45,7 @@ import {
 } from "MadUI"
 
 import type { Config } from "@/Config"
-import { defaultConfig, setLinkView } from "@/Config"
+import { defaultConfig, setLinkView, setCodeView } from "@/Config"
 
 doRender :: Config a -> Markdown -> Element a
 doRender = (config, markdown) =>
@@ -80,8 +79,8 @@ renderBlock = (config) => where {
   Blockquote(content) =>
     <blockquote>{...renderContent(config, content)}</blockquote>
 
-  Code(_, content) =>
-    <code>{content}</code>
+  Code(lang, content) =>
+    config.codeView(lang, content)
 
   UnorderedList(items) =>
     <ul>{...map((item) => <li>{...renderContent(config, item)}</li>, items)}</ul>
@@ -138,5 +137,6 @@ export renderMarkdownWithConfig = (config) => pipe(
  export renderMarkdown = renderMarkdownWithConfig(defaultConfig)
 
 export defaultConfig
+export setCodeView
 export setLinkView
 export type Config
