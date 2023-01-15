@@ -1,7 +1,9 @@
+import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
+
 import { Left, Right } from "Either"
 import String from "String"
 import IO from "IO"
-import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
+import { ifElse, always } from "Function"
 import {
   parseMarkdown,
   Bold,
@@ -70,20 +72,37 @@ makeCounter = (start) => {
   }
 }
 
-slug :: Countable -> List ContentPart -> String
-slug = (cx, x) => {
-  return pipe(
-    map(pipe(
+slug :: Countable -> String -> String
+export slug = (cx, z) => pipe(
+  String.toLower,
+  String.replace(" ", "-"),
+  (s) => `${s}-c${inspect(cx.count())}`
+)(z)
+
+slugContentPart :: Countable -> List ContentPart -> String
+slugContentPart = (cx, x) => pipe(
+  map(ifElse(
+    where {
+      Text(_) => true
+      Bold(_) => true
+      Link(_, _) => true
+      Image(_, _) => true
+      _ => false
+    },
+    pipe(
       where {
         Text(a) => a
+        Bold(a) => a
+        Link(_, lx) => lx
+        Image(alt, _) => alt
+        _ => ""
       },
-      String.toLower,
-      String.replace(" ", "-"),
-      (s) => `${s}-c${inspect(cx.count())}`
-    )),
-    String.join("")
-  )(x)
-}
+      slug(cx)
+    ),
+    always("")
+  )),
+  String.join("")
+)(x)
 
 doRender :: Config a -> Markdown -> Element a
 doRender = (config, markdown) => {
@@ -98,22 +117,22 @@ doRender = (config, markdown) => {
 renderBlock :: Countable -> Config a -> Block -> Element a
 renderBlock = (cx, config, block) => where (block) {
   H1(content) =>
-    <h1 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h1>
+    <h1 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h1>
 
   H2(content) =>
-    <h2 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h2>
+    <h2 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h2>
 
   H3(content) =>
-    <h3 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h3>
+    <h3 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h3>
 
   H4(content) =>
-    <h4 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h4>
+    <h4 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h4>
 
   H5(content) =>
-    <h5 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h5>
+    <h5 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h5>
 
   H6(content) =>
-    <h6 titleAttr={slug(cx, content)}>{...renderContent(config, content)}</h6>
+    <h6 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h6>
 
   Paragraph(content) =>
     <p>{...renderContent(config, content)}</p>
