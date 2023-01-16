@@ -1,5 +1,11 @@
-import { Left, Right } from "Either"
 import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
+
+import { Left, Right } from "Either"
+import { fromMaybe } from "Maybe"
+import String from "String"
+import { find } from "List"
+import IO from "IO"
+import { ifElse, always } from "Function"
 import {
   parseMarkdown,
   Bold,
@@ -22,6 +28,7 @@ import {
 } from "MadMarkdownParser"
 import type { Element } from "MadUI"
 import {
+  titleAttr,
   alt,
   blockquote,
   br,
@@ -47,31 +54,244 @@ import {
 import type { Config } from "@/Config"
 import { defaultConfig, setLinkView, setCodeView } from "@/Config"
 
-doRender :: Config a -> Markdown -> Element a
-doRender = (config, markdown) =>
-  <div className="markdown">
-    {...map(renderBlock(config), markdown)}
-  </div>
+alias Countable = {
+  count :: {} -> Integer,
+  reset :: {} -> Integer
+}
 
-renderBlock :: Config a -> Block -> Element a
-renderBlock = (config) => where {
+makeCounter :: Integer -> Countable
+makeCounter = (start) => {
+  seed = start
+  return {
+    count: () => {
+      seed = seed + 1 
+      return seed
+    },
+    reset: () => {
+      seed = 0
+      return seed
+    }
+  }
+}
+
+COERCIBLES = [
+  #[
+    "a",
+    [
+      'à', 'á', 'â', 'ä', 'æ', 'ã', 'å', 'ā', 'ă', 'ą'
+    ]
+  ],
+  #[
+    "c",
+    [
+      'ç', 'ć', 'č'
+    ]
+  ],
+  #[
+    "d",
+    [
+      'đ', 'ď'
+    ]
+  ],
+  #[
+    "e",
+    [
+      'è', 'é', 'ê', 'ë', 'ē', 'ė', 'ę', 'ě'
+    ]
+  ],
+  #[
+    "g",
+    [
+      'ğ', 'ǵ'
+    ]
+  ],
+  #[
+    "h",
+    [
+      'ḧ'
+    ]
+  ],
+  #[
+    "i",
+    [
+      'î', 'ï', 'í', 'ī', 'į', 'ì', 'ı', 'İ'
+    ]
+  ],
+  #[
+    "l",
+    [
+      'ł'
+    ]
+  ],
+  #[
+    "m",
+    [
+      'ḿ'
+    ]
+  ],
+  #[
+    "n",
+    [
+      'ñ', 'ń', 'ǹ', 'ň'
+    ]
+  ],
+  #[
+    "o",
+    [
+      'ô', 'ö', 'ò', 'ó', 'œ', 'ø', 'ō', 'õ', 'ő'
+    ]
+  ],
+  #[
+    "p",
+    [
+      'ṕ'
+    ]
+  ],
+  #[
+    "r",
+    [
+      'ŕ', 'ř'
+    ]
+  ],
+  #[
+    "s",
+    [
+      'ś', 'š', 'ş', 'ș'
+    ]
+  ],
+  #[
+    "ss",
+    [
+      "ß",
+    ]
+  ],
+  #[
+    "t",
+    [
+      'ť', 'ț'
+    ]
+  ],
+  #[
+    "u",
+    [
+      'û', 'ü', 'ù', 'ú', 'ū', 'ǘ', 'ů', 'ű', 'ų'
+    ]
+  ],
+  #[
+    "w",
+    [
+      'ẃ'
+    ]
+  ],
+  #[
+    "x",
+    [
+      'ẍ'
+    ]
+  ],
+  #[
+    "y",
+    [
+      'ÿ', 'ý'
+    ]
+  ],
+  #[
+    "z",
+    [
+      'ž', 'ź', 'ż'
+    ]
+  ],
+  #[
+    "-",
+    [
+      '·', '/', '_', ',', ':', ';'
+    ]
+  ]
+]
+
+slugify :: String -> String
+slugify = (z) => pipe(
+  String.toLower,
+  String.mapChars(pipe(
+    (char) => find(where (char) {
+      #[n, r] => includes(char, r)
+      _ => false
+    }, COERCIBLES),
+    fromMaybe('')
+  ))
+)(z)
+
+/*
+ .replace(/\s+/g, '-') // Replace spaces with -
+ .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+ .replace(/&/g, '-and-') // Replace & with 'and'
+ .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+ .replace(/\-\-+/g, '-') // Replace multiple - with single -
+ .replace(/^-+/, '') // Trim - from start of text
+ .replace(/-+$/, '') // Trim - from end of text
+**/
+
+slug :: Countable -> String -> String
+export slug = (cx, z) => pipe(
+  String.toLower,
+  String.replace(" ", "-"),
+  slugify,
+  (s) => `${s}-c${inspect(cx.count())}`
+)(z)
+
+slugContentPart :: Countable -> List ContentPart -> String
+slugContentPart = (cx, x) => pipe(
+  map(ifElse(
+    where {
+      Text(_) => true
+      Bold(_) => true
+      Link(_, _) => true
+      Image(_, _) => true
+      _ => false
+    },
+    pipe(
+      where {
+        Text(a) => a
+        Bold(a) => a
+        Link(_, lx) => lx
+        Image(alt, _) => alt
+        _ => ""
+      }, slug(cx)
+    ),
+    always("")
+  )),
+  String.join("")
+)(x)
+
+doRender :: Config a -> Markdown -> Element a
+doRender = (config, markdown) => {
+  cx = makeCounter(0)
+  return (
+    <div className="markdown">
+      {...map(renderBlock(cx, config), markdown)}
+    </div>
+  )
+}
+
+renderBlock :: Countable -> Config a -> Block -> Element a
+renderBlock = (cx, config, block) => where (block) {
   H1(content) =>
-    <h1>{...renderContent(config, content)}</h1>
+    <h1 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h1>
 
   H2(content) =>
-    <h2>{...renderContent(config, content)}</h2>
+    <h2 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h2>
 
   H3(content) =>
-    <h3>{...renderContent(config, content)}</h3>
+    <h3 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h3>
 
   H4(content) =>
-    <h4>{...renderContent(config, content)}</h4>
+    <h4 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h4>
 
   H5(content) =>
-    <h5>{...renderContent(config, content)}</h5>
+    <h5 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h5>
 
   H6(content) =>
-    <h6>{...renderContent(config, content)}</h6>
+    <h6 titleAttr={slugContentPart(cx, content)}>{...renderContent(config, content)}</h6>
 
   Paragraph(content) =>
     <p>{...renderContent(config, content)}</p>
@@ -140,3 +360,4 @@ export defaultConfig
 export setCodeView
 export setLinkView
 export type Config
+
