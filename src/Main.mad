@@ -1,7 +1,9 @@
 import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
 
 import { Left, Right } from "Either"
+import { fromMaybe } from "Maybe"
 import String from "String"
+import { find } from "List"
 import IO from "IO"
 import { ifElse, always } from "Function"
 import {
@@ -72,10 +74,168 @@ makeCounter = (start) => {
   }
 }
 
+COERCIBLES = [
+  #[
+    "a",
+    [
+      'à', 'á', 'â', 'ä', 'æ', 'ã', 'å', 'ā', 'ă', 'ą'
+    ]
+  ],
+  #[
+    "c",
+    [
+      'ç', 'ć', 'č'
+    ]
+  ],
+  #[
+    "d",
+    [
+      'đ', 'ď'
+    ]
+  ],
+  #[
+    "e",
+    [
+      'è', 'é', 'ê', 'ë', 'ē', 'ė', 'ę', 'ě'
+    ]
+  ],
+  #[
+    "g",
+    [
+      'ğ', 'ǵ'
+    ]
+  ],
+  #[
+    "h",
+    [
+      'ḧ'
+    ]
+  ],
+  #[
+    "i",
+    [
+      'î', 'ï', 'í', 'ī', 'į', 'ì', 'ı', 'İ'
+    ]
+  ],
+  #[
+    "l",
+    [
+      'ł'
+    ]
+  ],
+  #[
+    "m",
+    [
+      'ḿ'
+    ]
+  ],
+  #[
+    "n",
+    [
+      'ñ', 'ń', 'ǹ', 'ň'
+    ]
+  ],
+  #[
+    "o",
+    [
+      'ô', 'ö', 'ò', 'ó', 'œ', 'ø', 'ō', 'õ', 'ő'
+    ]
+  ],
+  #[
+    "p",
+    [
+      'ṕ'
+    ]
+  ],
+  #[
+    "r",
+    [
+      'ŕ', 'ř'
+    ]
+  ],
+  #[
+    "s",
+    [
+      'ś', 'š', 'ş', 'ș'
+    ]
+  ],
+  #[
+    "ss",
+    [
+      "ß",
+    ]
+  ],
+  #[
+    "t",
+    [
+      'ť', 'ț'
+    ]
+  ],
+  #[
+    "u",
+    [
+      'û', 'ü', 'ù', 'ú', 'ū', 'ǘ', 'ů', 'ű', 'ų'
+    ]
+  ],
+  #[
+    "w",
+    [
+      'ẃ'
+    ]
+  ],
+  #[
+    "x",
+    [
+      'ẍ'
+    ]
+  ],
+  #[
+    "y",
+    [
+      'ÿ', 'ý'
+    ]
+  ],
+  #[
+    "z",
+    [
+      'ž', 'ź', 'ż'
+    ]
+  ],
+  #[
+    "-",
+    [
+      '·', '/', '_', ',', ':', ';'
+    ]
+  ]
+]
+
+slugify :: String -> String
+slugify = (z) => pipe(
+  String.toLower,
+  String.mapChars(pipe(
+    (char) => find(where (char) {
+      #[n, r] => includes(char, r)
+      _ => false
+    }, COERCIBLES),
+    fromMaybe('')
+  ))
+)(z)
+
+/*
+ .replace(/\s+/g, '-') // Replace spaces with -
+ .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+ .replace(/&/g, '-and-') // Replace & with 'and'
+ .replace(/[^\w\-]+/g, '') // Remove all non-word characters
+ .replace(/\-\-+/g, '-') // Replace multiple - with single -
+ .replace(/^-+/, '') // Trim - from start of text
+ .replace(/-+$/, '') // Trim - from end of text
+**/
+
 slug :: Countable -> String -> String
 export slug = (cx, z) => pipe(
   String.toLower,
   String.replace(" ", "-"),
+  slugify,
   (s) => `${s}-c${inspect(cx.count())}`
 )(z)
 
@@ -96,8 +256,7 @@ slugContentPart = (cx, x) => pipe(
         Link(_, lx) => lx
         Image(alt, _) => alt
         _ => ""
-      },
-      slug(cx)
+      }, slug(cx)
     ),
     always("")
   )),
