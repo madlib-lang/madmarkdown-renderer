@@ -22,7 +22,7 @@ import {
 } from "MadMarkdownParser"
 import type { Element } from "MadUI"
 import {
-  alt,
+  altAttribute,
   blockquote,
   br,
   className,
@@ -104,7 +104,7 @@ renderContentPart = (config) => where{
     config.linkView(t, l)
 
   Image(alt_, s) =>
-    <img className="markdown__image" src={s} alt={alt_} />
+    <img className="markdown__image" src={s} altAttribute={alt_} />
 
   LineReturn =>
     <br />
