@@ -1,9 +1,12 @@
-import { Left, Right } from "Either"
 import type { Block, Content, ContentPart, Markdown } from "MadMarkdownParser"
+import type { Element } from "MadUI"
+
+import type { Config } from "@/Config"
+
+import { Left, Right } from "Either"
 import {
-  parseMarkdown,
-  Bold,
   Blockquote,
+  Bold,
   Code,
   H1,
   H2,
@@ -17,10 +20,10 @@ import {
   LineReturn,
   Link,
   Paragraph,
+  Text,
   UnorderedList,
-  Text
+  parseMarkdown,
 } from "MadMarkdownParser"
-import type { Element } from "MadUI"
 import {
   altAttribute,
   blockquote,
@@ -40,12 +43,13 @@ import {
   span,
   src,
   strong,
+  text,
   ul,
-  text
 } from "MadUI"
 
-import type { Config } from "@/Config"
-import { defaultConfig, setLinkView, setCodeView } from "@/Config"
+import { defaultConfig, setCodeView, setLinkView } from "@/Config"
+
+
 
 doRender :: Config a -> Markdown -> Element a
 doRender = (config, markdown) =>
@@ -56,49 +60,75 @@ doRender = (config, markdown) =>
 renderBlock :: Config a -> Block -> Element a
 renderBlock = (config) => where {
   H1(content) =>
-    <h1>{...renderContent(config, content)}</h1>
+    <h1>
+      {...renderContent(config, content)}
+    </h1>
 
   H2(content) =>
-    <h2>{...renderContent(config, content)}</h2>
+    <h2>
+      {...renderContent(config, content)}
+    </h2>
 
   H3(content) =>
-    <h3>{...renderContent(config, content)}</h3>
+    <h3>
+      {...renderContent(config, content)}
+    </h3>
 
   H4(content) =>
-    <h4>{...renderContent(config, content)}</h4>
+    <h4>
+      {...renderContent(config, content)}
+    </h4>
 
   H5(content) =>
-    <h5>{...renderContent(config, content)}</h5>
+    <h5>
+      {...renderContent(config, content)}
+    </h5>
 
   H6(content) =>
-    <h6>{...renderContent(config, content)}</h6>
+    <h6>
+      {...renderContent(config, content)}
+    </h6>
 
   Paragraph(content) =>
-    <p>{...renderContent(config, content)}</p>
+    <p>
+      {...renderContent(config, content)}
+    </p>
 
   Blockquote(content) =>
-    <blockquote>{...renderContent(config, content)}</blockquote>
+    <blockquote>
+      {...renderContent(config, content)}
+    </blockquote>
 
   Code(lang, content) =>
     config.codeView(lang, content)
 
   UnorderedList(items) =>
-    <ul>{...map((item) => <li>{...renderContent(config, item)}</li>, items)}</ul>
+    <ul>
+      {...map((item) => <li>{...renderContent(config, item)}</li>, items)}
+    </ul>
 }
 
 renderContentPart :: Config a -> ContentPart -> Element a
-renderContentPart = (config) => where{
+renderContentPart = (config) => where {
   Text(t) =>
-    <span className="markdown__text">{t}</span>
+    <span className="markdown__text">
+      {t}
+    </span>
 
   Bold(t) =>
-    <strong className="markdown__bold">{t}</strong>
+    <strong className="markdown__bold">
+      {t}
+    </strong>
 
   Italic(t) =>
-    <i className="markdown__italic">{t}</i>
+    <i className="markdown__italic">
+      {t}
+    </i>
 
   InlineCode(t) =>
-    <span className="markdown__inline-code">{t}</span>
+    <span className="markdown__inline-code">
+      {t}
+    </span>
 
   Link(t, l) =>
     config.linkView(t, l)
@@ -107,7 +137,7 @@ renderContentPart = (config) => where{
     <img className="markdown__image" src={s} altAttribute={alt_} />
 
   LineReturn =>
-    <br />
+    <br  />
 }
 
 renderContent :: Config a -> Content -> List (Element a)
@@ -122,8 +152,10 @@ export renderMarkdownWithConfig = (config) => pipe(
       doRender(config, ast)
 
     Left(_) =>
-      <p>Error processing the given markdown</p>
-  }
+      <p>
+        Error processing the given markdown
+      </p>
+  },
 )
 
 /**
@@ -133,8 +165,8 @@ export renderMarkdownWithConfig = (config) => pipe(
  * @example
  * renderMarkdown(`# Hello world`)
  */
- renderMarkdown :: String -> Element a
- export renderMarkdown = renderMarkdownWithConfig(defaultConfig)
+renderMarkdown :: String -> Element a
+export renderMarkdown = renderMarkdownWithConfig(defaultConfig)
 
 export defaultConfig
 export setCodeView
