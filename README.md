@@ -2,6 +2,7 @@
 Markdown renderer for [MadUI](https://github.com/madlib-lang/madui)
 
 ## How to use it
+
 Add it to the dependencies of your `madlib.json` file:
 ```json
 {
